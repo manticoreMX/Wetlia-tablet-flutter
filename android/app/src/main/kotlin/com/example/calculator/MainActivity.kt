@@ -1,4 +1,4 @@
-package net.multimediacorp.www
+package com.calculadora.org
 
 import io.flutter.embedding.android.FlutterActivity
 

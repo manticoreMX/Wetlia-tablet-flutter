@@ -55,19 +55,19 @@ class LoginScreenState extends State<LoginScreen> {
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                  Image.asset('assets/images/logo-m.png'),
+                  Image.asset('assets/images/logo-m.png',
+                      width: MediaQuery.of(context).size.width / 2),
                   Text(
                     'Iniciar sesión',
                     style: TextStyle(
                         color: Colors.white,
-                        fontSize: 32,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold),
                   ),
                   Container(
                     width: 360,
-                    height: 340,
                     padding: EdgeInsets.symmetric(horizontal: 32, vertical: 32),
-                    margin: EdgeInsets.symmetric(vertical: 16),
+                    margin: EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.all(Radius.circular(12))),
@@ -78,23 +78,23 @@ class LoginScreenState extends State<LoginScreen> {
                           labelText: 'Correo electrónico',
                           textInputType: TextInputType.emailAddress,
                         ),
-                        SizedBox(height: 32),
+                        SizedBox(height: 20),
                         CustomInputField(
                           controller: passwordController,
                           labelText: 'Contraseña',
                           obscureText: true,
                           textInputType: TextInputType.visiblePassword,
                         ),
-                        SizedBox(height: 32),
+                        SizedBox(height: 12),
                         CustomButton(
                             text: '¿Olvidaste tu contraseña?',
-                            fontSize: 20,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                             textColor: Colors.blue,
                             backColor: Colors.white,
                             width: 0,
                             onPressed: gotoReset),
-                        SizedBox(height: 16),
+                        SizedBox(height: 4),
                         CustomButton(
                             text: 'INGRESAR',
                             fontSize: 16,
@@ -105,7 +105,7 @@ class LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                   ),
-                  Image.asset('assets/images/logo.png', width: 40, height: 40)
+                  Image.asset('assets/images/logo.png', width: 80, height: 80)
                 ]))));
   }
 

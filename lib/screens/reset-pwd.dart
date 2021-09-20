@@ -38,18 +38,19 @@ class ResetScreenState extends State<ResetScreen> {
           height: double.infinity,
           decoration: BoxDecoration(
               image: DecorationImage(
-                  fit: BoxFit.fitHeight,
+                  fit: BoxFit.cover,
                   image: AssetImage('assets/images/back1.jpg'))),
           child: SingleChildScrollView(
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                Image.asset('assets/images/logo-l.png'),
+                Image.asset('assets/images/logo-m.png',
+                    width: MediaQuery.of(context).size.width / 2),
                 Text(
                   'Restablecer Contraseña',
                   style: TextStyle(
                       color: Colors.white,
-                      fontSize: 30,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold),
                 ),
                 Container(
@@ -78,8 +79,8 @@ class ResetScreenState extends State<ResetScreen> {
                     ],
                   ),
                 ),
-                SizedBox(height: 32),
-                Image.asset('assets/images/logo.png', width: 40, height: 40)
+                SizedBox(height: 12),
+                Image.asset('assets/images/logo.png', width: 80, height: 80)
               ]))),
       opacity: 0.5,
       progressIndicator: CircularProgressIndicator(

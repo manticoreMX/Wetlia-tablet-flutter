@@ -76,7 +76,8 @@ class HomeScreenState extends State<HomeScreen> {
     setState(() {
       this._clients = clients;
       this._distributors = distributors;
-      _pUnitario.text = jsonDecode(res['FullPrice'])[0]['FullPrice'].toString();
+      pUnitario = (jsonDecode(res['FullPrice'])[0]['FullPrice']).toDouble();
+      _pUnitario.text = addComa(pUnitario);
       loading = false;
     });
   }
@@ -126,65 +127,51 @@ class HomeScreenState extends State<HomeScreen> {
     this.vam = double.tryParse(_vam.text) ?? 0;
     this.vem = double.tryParse(_vem.text) ?? 0;
 
-    int pu = int.parse(_pUnitario.text);
+    double pu = pUnitario;
     var aux_ppv = 0.0;
     switch (ccaIndex) {
       case 0:
-        {
-          aux_ppv = pu.toDouble();
-          setState(() {
-            showe1 = false;
-          });
-          break;
-        }
+        hidel();
+        aux_ppv = pu.toDouble();
+        break;
       case 1:
-        {
-          aux_ppv = 37789.0 / 3.0;
-          setState(() {
-            showe1 = false;
-          });
-          break;
-        }
+        hidel();
+        aux_ppv = double.parse((37789.0 / 3.0).toStringAsFixed(2));
+        break;
       case 2:
-        {
-          aux_ppv = 5.0 * pu / 13.0;
-          setState(() {
-            showe1 = false;
-          });
-          break;
-        }
+        hidel();
+        aux_ppv = double.parse((5.0 * pu / 13.0).toStringAsFixed(2));
+        break;
       case 3:
-        {
-          aux_ppv = 10.0 * pu / 27.0;
-          setState(() {
-            showe1 = false;
-          });
-          break;
-        }
+        hidel();
+        aux_ppv = double.parse((10.0 * pu / 27.0).toStringAsFixed(2));
+        break;
       case 5:
-        {
-          setState(() {
-            showe1 = true;
-            e1Title = 'Tipo de condición comercial especial:% vs Full Price';
-            x1aT = '%';
-            x2aT = 'Full Price';
-            _x2a.text = '23558.00';
-            setState(() => x2aReadOnly = true);
-            aux_ppv = (pu * (100 - x1a)) / 100.0;
-          });
-        }
+        e1Title = 'Tipo de condición comercial especial: % vs Full Price';
+        x1aT = '%';
+        x2aT = 'Full Price';
+        showl();
+        setState(() {
+          _x2a.text = '23558.00';
+          x2aReadOnly = true;
+        });
+        aux_ppv = double.parse(((pu * (100 - x1a)) / 100.0).toStringAsFixed(2));
         break;
       case 4:
-        {
-          setState(() {
-            showe1 = true;
-            e1Title = 'Tipo de condición comercial especial:X1 + X2';
-            x1aT = 'X1';
-            x2aT = 'X2';
-            setState(() => x2aReadOnly = false);
-            aux_ppv = (x1a * pu) / (x1a + x2a);
-          });
+        showl();
+        e1Title = 'Tipo de condición comercial especial: X1 + X2';
+        x1aT = 'X1';
+        x2aT = 'X2';
+        setState(() {
+          x2aReadOnly = false;
+          if (_x2a.text == '23558.00') _x2a.text = '0';
+        });
+        if (x1a + x2a != 0)
+          aux_ppv = double.parse(((x1a * pu) / (x1a + x2a)).toStringAsFixed(2));
+        else {
+          return setNan();
         }
+
         break;
       default:
     }
@@ -195,9 +182,24 @@ class HomeScreenState extends State<HomeScreen> {
       _dsfpa.text = (100 - (aux_ppv / pu) * 100).toStringAsFixed(0) + '%';
       double aux1 =
           (double.tryParse(_vem.text) ?? 0) * propAlg['Precio Promedio'];
-      double aux2 = (double.tryParse(_vam.text) ?? 0) * aux_ppv;
+      double aux2 = (double.tryParse(_vam.text) ?? 0) * aux_ppv.floor();
       _dev.text = addComa(aux1 - aux2);
     }
+  }
+
+  showl() {
+    this.setState(() {
+      showe1 = true;
+      // _x1a.text = '0';
+      // _x2a.text = '0';
+    });
+  }
+
+  hidel() {
+    this.setState(() {
+      showe1 = false;
+      _x2aPlaceholder = '';
+    });
   }
 
   dynamic evalPropuesta(double val) {
@@ -290,7 +292,16 @@ class HomeScreenState extends State<HomeScreen> {
     return j;
   }
 
-  String addComa(double val) {
+  setNan() {
+    _dsfpa.text = 'NaN';
+    _dsfpe.text = '63%';
+    _dev.text = 'NaN';
+    _ppva.text = 'NaN';
+    _ppve.text = '8725.19';
+    _ccp.text = '10+17';
+  }
+
+  String addComa(val) {
     var r = (val.abs() % 1000).abs().toStringAsFixed(2);
     var m = (val / 1000).truncate();
     var l = r.split(".")[0].length;
@@ -310,6 +321,7 @@ class HomeScreenState extends State<HomeScreen> {
   List<String> _distributors = [];
   List<String> _clients = [];
   int clientId = 0, distributorId = 0;
+  double pUnitario = 0;
   bool loading = false;
   bool showe1 = false;
   bool x2aReadOnly = false;
@@ -319,6 +331,7 @@ class HomeScreenState extends State<HomeScreen> {
   double x2a = 0;
   double vam = 0;
   double vem = 0;
+  String _x2aPlaceholder = '';
   String e1Title = 'Tipo de condición comercial especial:% vs Full Price';
   String x1aT = '%';
   String x2aT = 'Full Price';
@@ -357,6 +370,12 @@ class HomeScreenState extends State<HomeScreen> {
     var landscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return Container(
       height: double.infinity,
+      decoration: BoxDecoration(
+          image: DecorationImage(
+              fit: BoxFit.cover,
+              image: AssetImage(landscape
+                  ? 'assets/images/back2.png'
+                  : 'assets/images/back2.png'))),
       child: SingleChildScrollView(
           child: Container(
         // height: MediaQuery.of(context).size.height -
@@ -369,207 +388,141 @@ class HomeScreenState extends State<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Container(
-                    padding: EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(
-                        borderRadius:
-                            BorderRadius.vertical(bottom: Radius.circular(16)),
-                        image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: AssetImage(landscape
-                                ? 'assets/images/back1.jpg'
-                                : 'assets/images/back1.jpg'))),
-                    child: Column(
-                      children: [
-                        Image.asset(landscape
-                            ? 'assets/images/header-tablet.png'
-                            : 'assets/images/header-phone.png'),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Image.asset('assets/images/product.png',
-                                width: 140),
-                            Image.asset('assets/images/logo-m.png', width: 180),
-                          ],
-                        ),
-                        loading
-                            ? Container()
-                            : Container(
-                                padding: EdgeInsets.only(
-                                    left: 8, right: 8, bottom: 12),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    CustomDropdown(
-                                        landscape: landscape,
-                                        items: this._distributors,
-                                        title: 'Distribuidor',
-                                        value: distributorId,
-                                        onChanged: onDistributorChanged),
-                                    CustomDropdown(
-                                        landscape: landscape,
-                                        items: this._clients,
-                                        title: 'Clientes',
-                                        value: clientId,
-                                        onChanged: onClientChanged)
-                                  ],
-                                )),
-                      ],
-                    )),
-                SizedBox(height: 20),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  width: double.infinity,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          children: [
-                            CustomInputField(
-                              controller: _pUnitario,
-                              textInputType: TextInputType.number,
-                              paddingLeft: 0,
-                              textAlign: TextAlign.center,
-                              height: 36,
-                              readOnly: true,
-                            ),
-                            SizedBox(height: 6),
-                            Text(
-                              'Full Price',
-                              style:
-                                  TextStyle(fontSize: 12, color: Colors.grey),
-                            )
-                          ],
-                        ),
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          children: [
-                            CustomInputField(
-                              controller: _dsfpa,
-                              textInputType: TextInputType.number,
-                              paddingLeft: 0,
-                              textAlign: TextAlign.center,
-                              height: 36,
-                              readOnly: true,
-                            ),
-                            SizedBox(height: 6),
-                            Text(
-                              'Descuento sobre Full Price actual',
-                              style:
-                                  TextStyle(fontSize: 12, color: Colors.grey),
-                              overflow: TextOverflow.ellipsis,
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 18),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12),
-                  width: double.infinity,
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          children: [
-                            CustomInputField(
-                              controller: _dsfpe,
-                              textAlign: TextAlign.center,
-                              paddingLeft: 0,
-                              textInputType: TextInputType.number,
-                              height: 36,
-                              readOnly: true,
-                            ),
-                            SizedBox(height: 6),
-                            Text(
-                              'Nuevo descuento sobre Full Price',
-                              style:
-                                  TextStyle(fontSize: 12, color: Colors.grey),
-                              overflow: TextOverflow.ellipsis,
-                            )
-                          ],
-                        ),
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          children: [
-                            CustomInputField(
-                              controller: _dev,
-                              textAlign: TextAlign.center,
-                              textInputType: TextInputType.number,
-                              paddingLeft: 0,
-                              height: 36,
-                              readOnly: true,
-                            ),
-                            SizedBox(height: 6),
-                            Text(
-                              'Diferencia en valores',
-                              style:
-                                  TextStyle(fontSize: 12, color: Colors.grey),
-                              overflow: TextOverflow.ellipsis,
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 12),
-                Container(
+                  height: MediaQuery.of(context).size.width * 0.366,
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                          fit: BoxFit.fitWidth,
+                          image: AssetImage(landscape
+                              ? 'assets/images/back-tablet.jpg'
+                              : 'assets/images/back-tablet.jpg'))),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: fieldLeft(
-                              'Viales actuales x mes',
-                              CustomInputField(
-                                controller: _vam,
-                                textInputType: TextInputType.number,
-                                height: 30,
-                                borderWidth: 3,
-                                paddingTop: 0,
-                                paddingLeft: 0,
-                                fontSize: 12,
-                                textAlign: TextAlign.center,
-                                borderColor: Colors.grey[800]!,
-                                backColor: Colors.white,
-                                alignment: Alignment.center,
-                                onChanged: onVamChanged,
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: fieldRight(
-                              'Viales esperados x mes',
-                              CustomInputField(
-                                controller: _vem,
-                                textInputType: TextInputType.number,
-                                height: 30,
-                                borderWidth: 3,
-                                borderColor: Colors.grey[800]!,
-                                paddingTop: 0,
-                                paddingLeft: 0,
-                                fontSize: 12,
-                                textAlign: TextAlign.center,
-                                backColor: Colors.white,
-                                onChanged: onVemChanged,
-                              ),
-                            ),
-                          ),
-                        ],
+                      Image.asset(
+                        landscape
+                            ? 'assets/images/header-tablet.png'
+                            : 'assets/images/header-tablet.png',
                       ),
-                      SizedBox(height: 12),
-                      Row(
+                      Column(
                         children: [
-                          Expanded(
-                            child: fieldLeft(
-                                'Condición comercial actual',
+                          loading
+                              ? Container()
+                              : Container(
+                                  padding: EdgeInsets.only(left: 16, right: 16),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      CustomDropdown(
+                                          landscape: true,
+                                          items: this._distributors,
+                                          title: 'Distribuidor',
+                                          value: distributorId,
+                                          onChanged: onDistributorChanged),
+                                      SizedBox(width: 12),
+                                      CustomDropdown(
+                                          landscape: true,
+                                          items: this._clients,
+                                          title: 'Clientes',
+                                          value: clientId,
+                                          onChanged: onClientChanged)
+                                    ],
+                                  ),
+                                ),
+                          SizedBox(
+                              height:
+                                  MediaQuery.of(context).size.width * 0.035),
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width / 3.0,
+                                  margin: EdgeInsets.symmetric(horizontal: 12),
+                                  child: fieldLeft(
+                                    'Viales actuales x mes',
+                                    CustomInputField(
+                                      controller: _vam,
+                                      textInputType: TextInputType.number,
+                                      height: 30,
+                                      borderWidth: 3,
+                                      paddingTop: 0,
+                                      paddingLeft: 0,
+                                      fontSize: 12,
+                                      textAlign: TextAlign.center,
+                                      borderColor: Colors.grey[800]!,
+                                      backColor: Colors.white,
+                                      alignment: Alignment.center,
+                                      onChanged: onVamChanged,
+                                    ),
+                                  ),
+                                ),
+                                Column(
+                                  children: [
+                                    Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.2,
+                                        child: CustomInputField(
+                                          controller: _pUnitario,
+                                          textInputType: TextInputType.number,
+                                          paddingLeft: 0,
+                                          textAlign: TextAlign.center,
+                                          height: 36,
+                                          readOnly: true,
+                                          backColor: Colors.white,
+                                        )),
+                                    SizedBox(height: 6),
+                                    Text(
+                                      'Full Price',
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.white),
+                                    )
+                                  ],
+                                ),
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width / 3.0,
+                                  margin: EdgeInsets.symmetric(horizontal: 12),
+                                  child: fieldRight(
+                                    'Viales esperados x mes',
+                                    CustomInputField(
+                                      controller: _vem,
+                                      textInputType: TextInputType.number,
+                                      height: 30,
+                                      borderWidth: 3,
+                                      borderColor: Colors.grey[800]!,
+                                      paddingTop: 0,
+                                      paddingLeft: 0,
+                                      fontSize: 12,
+                                      textAlign: TextAlign.center,
+                                      backColor: Colors.white,
+                                      onChanged: onVemChanged,
+                                    ),
+                                  ),
+                                ),
+                              ])
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+
+                // Section 1 finished
+                Container(
+                    padding: EdgeInsets.only(top: 8),
+                    color: Colors.white,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width / 3.0,
+                          margin: EdgeInsets.symmetric(horizontal: 12),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              fieldLeft(
+                                'Diferencial en valores',
                                 CustomDropdowHome(
                                     landscape: true,
                                     items: [
@@ -580,159 +533,234 @@ class HomeScreenState extends State<HomeScreen> {
                                       'X1+X2',
                                       '% vs FP'
                                     ],
-                                    onChanged: ccaChanged)),
-                          ),
-                          Expanded(
-                            child: fieldRight(
-                              'Condición comercial propuesta',
-                              // CustomDropdowHome(
-                              //     landscape: true,
-                              //     items: ['items'],
-                              //     onChanged: () {}),
-                              CustomInputField(
-                                controller: _ccp,
-                                textInputType: TextInputType.number,
-                                height: 30,
-                                borderWidth: 3,
-                                borderColor: Colors.grey[800]!,
-                                paddingTop: 0,
-                                paddingLeft: 0,
-                                fontSize: 12,
-                                textAlign: TextAlign.center,
-                                backColor: Colors.white,
-                                readOnly: true,
+                                    onChanged: ccaChanged),
                               ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 12),
-                      Visibility(
-                          child: Container(
-                            margin: EdgeInsets.only(
-                                left: 12, right: 12, bottom: 12),
-                            padding: EdgeInsets.symmetric(vertical: 8),
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                                color: mainColor,
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(8))),
-                            child: Column(
-                              children: [
-                                Text(
-                                  e1Title,
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 10),
-                                ),
-                                SizedBox(height: 4),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      x1aT,
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 10),
-                                    ),
-                                    Container(
-                                      margin:
-                                          EdgeInsets.symmetric(horizontal: 4),
-                                      width: 80,
-                                      child: CustomInputField(
-                                        controller: _x1a,
-                                        textInputType: TextInputType.number,
-                                        height: 30,
-                                        borderWidth: 3,
-                                        borderColor: Colors.grey[800]!,
-                                        paddingTop: 0,
-                                        paddingLeft: 0,
-                                        fontSize: 12,
-                                        textAlign: TextAlign.center,
-                                        backColor: Colors.white,
-                                        onChanged: x1aChanged,
-                                      ),
-                                    ),
-                                    Text(
-                                      x2aT,
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 10),
-                                    ),
-                                    Container(
-                                      width: 80,
-                                      margin:
-                                          EdgeInsets.symmetric(horizontal: 4),
-                                      child: CustomInputField(
-                                        controller: _x2a,
-                                        textInputType: TextInputType.number,
-                                        height: 30,
-                                        borderWidth: 3,
-                                        borderColor: Colors.grey[800]!,
-                                        paddingTop: 0,
-                                        paddingLeft: 0,
-                                        fontSize: 12,
-                                        readOnly: x2aReadOnly,
-                                        textAlign: TextAlign.center,
-                                        backColor: Colors.white,
-                                        onChanged: x2aChanged,
+                              showe1
+                                  ? Container(
+                                      margin: EdgeInsets.only(
+                                          left: 12,
+                                          right: 6,
+                                          top: 6,
+                                          bottom: 6),
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 8),
+                                      width: double.infinity,
+                                      decoration: BoxDecoration(
+                                          color: mainColor,
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(8))),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            e1Title,
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                          SizedBox(height: 4),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                x1aT,
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 10),
+                                              ),
+                                              Container(
+                                                margin: EdgeInsets.symmetric(
+                                                    horizontal: 4),
+                                                width: 80,
+                                                child: CustomInputField(
+                                                  controller: _x1a,
+                                                  textInputType:
+                                                      TextInputType.number,
+                                                  height: 30,
+                                                  borderWidth: 3,
+                                                  borderColor:
+                                                      Colors.grey[800]!,
+                                                  paddingTop: 0,
+                                                  paddingLeft: 0,
+                                                  fontSize: 12,
+                                                  textAlign: TextAlign.center,
+                                                  backColor: Colors.white,
+                                                  onChanged: x1aChanged,
+                                                ),
+                                              ),
+                                              Text(
+                                                x2aT,
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 10),
+                                              ),
+                                              Container(
+                                                width: 80,
+                                                margin: EdgeInsets.symmetric(
+                                                    horizontal: 4),
+                                                child: CustomInputField(
+                                                  controller: _x2a,
+                                                  textInputType:
+                                                      TextInputType.number,
+                                                  height: 30,
+                                                  borderWidth: 3,
+                                                  borderColor:
+                                                      Colors.grey[800]!,
+                                                  paddingTop: 0,
+                                                  paddingLeft: 0,
+                                                  fontSize: 12,
+                                                  readOnly: x2aReadOnly,
+                                                  textAlign: TextAlign.center,
+                                                  backColor: Colors.white,
+                                                  onChanged: x2aChanged,
+                                                ),
+                                              )
+                                            ],
+                                          )
+                                        ],
                                       ),
                                     )
+                                  : SizedBox(height: 40),
+                              fieldLeft(
+                                'Precio promedio x vial actual',
+                                CustomInputField(
+                                  controller: _ppva,
+                                  textInputType: TextInputType.number,
+                                  height: 30,
+                                  borderWidth: 3,
+                                  borderColor: Colors.grey[800]!,
+                                  paddingTop: 0,
+                                  paddingLeft: 0,
+                                  fontSize: 12,
+                                  textAlign: TextAlign.center,
+                                  backColor: Colors.white,
+                                  readOnly: true,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.2,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                child: Column(
+                                  children: [
+                                    CustomInputField(
+                                      controller: _dsfpa,
+                                      textInputType: TextInputType.number,
+                                      paddingLeft: 0,
+                                      textAlign: TextAlign.center,
+                                      height: 36,
+                                      readOnly: true,
+                                    ),
+                                    SizedBox(height: 6),
+                                    Text(
+                                      'Descuento sobre Full Price actual',
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.grey),
+                                      overflow: TextOverflow.ellipsis,
+                                    )
                                   ],
-                                )
-                              ],
-                            ),
-                          ),
-                          visible: showe1),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: fieldLeft(
-                              'Precio promedio x vial actual',
-                              CustomInputField(
-                                controller: _ppva,
-                                textInputType: TextInputType.number,
-                                height: 30,
-                                borderWidth: 3,
-                                borderColor: Colors.grey[800]!,
-                                paddingTop: 0,
-                                paddingLeft: 0,
-                                fontSize: 12,
-                                textAlign: TextAlign.center,
-                                backColor: Colors.white,
-                                readOnly: true,
+                                ),
                               ),
-                            ),
-                          ),
-                          Expanded(
-                            child: fieldRight(
-                              'Nuevo pecio promedio',
-                              CustomInputField(
-                                controller: _ppve,
-                                textInputType: TextInputType.number,
-                                height: 30,
-                                borderWidth: 3,
-                                borderColor: Colors.grey[800]!,
-                                paddingTop: 0,
-                                paddingLeft: 0,
-                                fontSize: 12,
-                                textAlign: TextAlign.center,
-                                backColor: Colors.white,
-                                readOnly: true,
+                              SizedBox(height: 8),
+                              Container(
+                                child: Column(
+                                  children: [
+                                    CustomInputField(
+                                      controller: _dsfpe,
+                                      textAlign: TextAlign.center,
+                                      paddingLeft: 0,
+                                      textInputType: TextInputType.number,
+                                      height: 36,
+                                      readOnly: true,
+                                    ),
+                                    SizedBox(height: 6),
+                                    Text(
+                                      'Nuevo descuento sobre Full Price',
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.grey),
+                                      overflow: TextOverflow.ellipsis,
+                                    )
+                                  ],
+                                ),
                               ),
-                            ),
+                              SizedBox(height: 8),
+                              Container(
+                                child: Column(
+                                  children: [
+                                    CustomInputField(
+                                      controller: _dev,
+                                      textAlign: TextAlign.center,
+                                      textInputType: TextInputType.number,
+                                      paddingLeft: 0,
+                                      height: 36,
+                                      readOnly: true,
+                                    ),
+                                    SizedBox(height: 6),
+                                    Text(
+                                      'Diferencial en valores',
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.grey),
+                                      overflow: TextOverflow.ellipsis,
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      )
-                    ],
-                  ),
-                ),
+                        ),
+                        Container(
+                          width: MediaQuery.of(context).size.width / 3.0,
+                          margin: EdgeInsets.symmetric(horizontal: 12),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              fieldRight(
+                                'Condición comercial propuesta',
+                                CustomInputField(
+                                  controller: _ccp,
+                                  textInputType: TextInputType.number,
+                                  height: 30,
+                                  borderWidth: 3,
+                                  borderColor: Colors.grey[800]!,
+                                  paddingTop: 0,
+                                  paddingLeft: 0,
+                                  fontSize: 12,
+                                  textAlign: TextAlign.center,
+                                  backColor: Colors.white,
+                                  readOnly: true,
+                                ),
+                              ),
+                              SizedBox(height: 40),
+                              fieldRight(
+                                'Nuevo precio promedio',
+                                CustomInputField(
+                                  controller: _ppve,
+                                  textInputType: TextInputType.number,
+                                  height: 30,
+                                  borderWidth: 3,
+                                  borderColor: Colors.grey[800]!,
+                                  paddingTop: 0,
+                                  paddingLeft: 0,
+                                  fontSize: 12,
+                                  textAlign: TextAlign.center,
+                                  backColor: Colors.white,
+                                  readOnly: true,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ))
               ],
             )),
             Container(
-              decoration: BoxDecoration(
-                  image: DecorationImage(
-                      fit: BoxFit.cover,
-                      image: AssetImage(landscape
-                          ? 'assets/images/back2.png'
-                          : 'assets/images/back2.png'))),
               padding: EdgeInsets.only(bottom: 12),
               child: Column(
                 children: [
@@ -759,7 +787,7 @@ class HomeScreenState extends State<HomeScreen> {
                           iconName: 'back', title: 'Atrás', onPressed: onBack),
                       Button(
                           iconName: 'next',
-                          title: 'Siguinte',
+                          title: 'Siguiente',
                           onPressed: onNext,
                           iconRight: true),
                     ],
@@ -792,7 +820,7 @@ class HomeScreenState extends State<HomeScreen> {
             ),
           ),
           Container(
-            width: 72,
+            width: 100,
             padding: EdgeInsets.only(left: 8),
             margin: EdgeInsets.only(left: 8),
             decoration: BoxDecoration(
@@ -817,7 +845,7 @@ class HomeScreenState extends State<HomeScreen> {
       child: Row(
         children: [
           Container(
-            width: 72,
+            width: 100,
             padding: EdgeInsets.only(right: 8),
             margin: EdgeInsets.only(right: 8),
             decoration: BoxDecoration(
@@ -905,9 +933,7 @@ class HomeScreenState extends State<HomeScreen> {
       'FechaFin': getDate2()
     };
     prefs.setString('Propuesta', jsonEncode(json));
-    showSnackbar(
-        'Los datos han sido guardados en el dispositivo. Puedes proceder a enviar correo.',
-        context);
+    showSnackbar('Los datos han sido guardados en el dispositivo.', context);
     this.saved = true;
   }
 

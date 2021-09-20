@@ -64,111 +64,114 @@ class SummaryScreenState extends State<SummaryScreen> {
   Widget summaryBody() {
     var landscape = MediaQuery.of(context).orientation == Orientation.landscape;
     return Container(
-      height: double.infinity,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Container(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Container(
-                    padding: EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(
-                        borderRadius:
-                            BorderRadius.vertical(bottom: Radius.circular(16)),
-                        image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: AssetImage(landscape
-                                ? 'assets/images/back1.jpg'
-                                : 'assets/images/back1.jpg'))),
-                    child: Column(
-                      children: [
-                        Image.asset(landscape
-                            ? 'assets/images/header-tablet.png'
-                            : 'assets/images/header-phone.png'),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Image.asset('assets/images/product.png',
-                                width: 140),
-                            Image.asset('assets/images/logo-m.png', width: 180),
-                          ],
-                        ),
-                        SizedBox(height: 16),
-                      ],
-                    )),
-                Container(
-                  child: Column(
-                    children: [
-                      SizedBox(height: 12),
-                      Text(
-                        'Resumen',
-                        style: TextStyle(color: Colors.grey, fontSize: 32),
-                      ),
-                      SizedBox(height: 12),
-                      Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                        decoration: BoxDecoration(color: mainColor),
+        decoration: BoxDecoration(
+            image: DecorationImage(
+                fit: BoxFit.cover,
+                image: AssetImage(landscape
+                    ? 'assets/images/back2.png'
+                    : 'assets/images/back2.png'))),
+        height: double.infinity,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Container(
+                color: Colors.white,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Container(
+                        height: MediaQuery.of(context).size.width * 0.284,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.vertical(
+                                bottom: Radius.circular(16)),
+                            image: DecorationImage(
+                                fit: BoxFit.fitWidth,
+                                image: AssetImage(landscape
+                                    ? 'assets/images/back-tablet-1.jpg'
+                                    : 'assets/images/back-tablet-1.jpg'))),
                         child: Column(
                           children: [
-                            SummaryItem(title: 'Cliente', value: cliente),
-                            SummaryItem(
-                                title: 'Nuevo precio promedio x vial',
-                                value: precio),
-                            SummaryItem(
-                                title: 'Descuento vs Full Price',
-                                value: descuento),
-                            SummaryItem(
-                                title: 'Rentabilidad total',
-                                value: rentabilidad),
-                            SummaryItem(
-                                title: 'Distribuidor', value: distribuidor),
+                            Image.asset(landscape
+                                ? 'assets/images/header-tablet.png'
+                                : 'assets/images/header-tablet.png'),
                           ],
-                        ),
-                      ),
-                      SizedBox(height: 32),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: AssetImage(landscape
-                        ? 'assets/images/back2.png'
-                        : 'assets/images/back2.png'))),
-            padding: EdgeInsets.only(bottom: 12),
-            child: Column(
-              children: [
-                Container(
-                  height: 24,
-                  decoration: BoxDecoration(
+                        )),
+                    Container(
                       color: Colors.white,
-                      borderRadius:
-                          BorderRadius.vertical(bottom: Radius.circular(16))),
-                ),
-                SizedBox(height: 12),
-                Wrap(
-                  runSpacing: 12,
-                  children: [
-                    Button(
-                        iconName: 'save', title: 'Guardar', onPressed: onSave),
-                    Button(
-                        iconName: 'email', title: 'Enviar', onPressed: onSend),
-                    Button(iconName: 'back', title: 'Atrás', onPressed: onBack),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 12),
+                          Text(
+                            'Resumen',
+                            style: TextStyle(color: Colors.grey, fontSize: 32),
+                          ),
+                          SizedBox(height: 12),
+                          Container(
+                            margin: EdgeInsets.symmetric(horizontal: 12),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 12),
+                            decoration: BoxDecoration(color: mainColor),
+                            child: Column(
+                              children: [
+                                SummaryItem(title: 'Cliente', value: cliente),
+                                SummaryItem(
+                                    title: 'Nuevo precio promedio x vial',
+                                    value: precio),
+                                SummaryItem(
+                                    title: 'Descuento vs Full Price',
+                                    value: descuento),
+                                SummaryItem(
+                                    title: 'Rentabilidad total',
+                                    value: rentabilidad),
+                                SummaryItem(
+                                    title: 'Distribuidor', value: distribuidor),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 12),
+                        ],
+                      ),
+                    ),
                   ],
-                )
-              ],
-            ),
-          )
-        ],
-      ),
-    );
+                ),
+              ),
+              Container(
+                //
+                padding: EdgeInsets.only(bottom: 12),
+                child: Column(
+                  children: [
+                    Container(
+                      height: 24,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.vertical(
+                              bottom: Radius.circular(16))),
+                    ),
+                    SizedBox(height: 12),
+                    Wrap(
+                      runSpacing: 12,
+                      children: [
+                        Button(
+                            iconName: 'back',
+                            title: 'Atrás',
+                            onPressed: onBack),
+                        Button(
+                            iconName: 'save',
+                            title: 'Guardar',
+                            onPressed: onSave),
+                        Button(
+                            iconName: 'email',
+                            title: 'Enviar',
+                            onPressed: onSend),
+                      ],
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+        ));
   }
 
   onSend() async {

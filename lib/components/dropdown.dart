@@ -45,16 +45,19 @@ class CustomDropdownState extends State<CustomDropdown> {
         style: TextStyle(
             color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
       ),
-      widget.landscape ? Container() : SizedBox(height: 12),
+      widget.landscape ? SizedBox(width: 12) : SizedBox(height: 12),
       DropdownButtonHideUnderline(
         child: DropdownBelow(
             items: ddItems,
-            boxDecoration: BoxDecoration(color: Colors.white),
+            boxDecoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.all(Radius.circular(20)),
+                border: Border.all(width: 1, color: Colors.grey)),
             itemWidth: 320,
             itemTextstyle: TextStyle(fontSize: 14, color: Colors.black),
             boxTextstyle: TextStyle(fontSize: 14, color: Colors.black),
             boxPadding: EdgeInsets.symmetric(horizontal: 12),
-            boxHeight: 45,
+            boxHeight: 32,
             boxWidth: 180,
             icon: Icon(Icons.expand_more_rounded, color: Colors.grey, size: 20),
             value: index!,

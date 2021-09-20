@@ -36,7 +36,8 @@ class CustomDropdownHomeState extends State<CustomDropdowHome> {
     int i = 0;
     widget.items.forEach((element) {
       ddItems.add(DropdownMenuItem(
-          child: Text(element, overflow: TextOverflow.ellipsis), value: i++));
+          child: Center(child: Text(element, overflow: TextOverflow.ellipsis)),
+          value: i++));
     });
     Widget child = DropdownButtonHideUnderline(
         child: DropdownBelow(
@@ -48,17 +49,15 @@ class CustomDropdownHomeState extends State<CustomDropdowHome> {
             itemWidth: 180,
             itemTextstyle: TextStyle(fontSize: 12, color: Colors.black),
             boxTextstyle: TextStyle(fontSize: 10, color: Colors.black),
-            boxPadding: EdgeInsets.only(left: 4),
+            boxPadding: EdgeInsets.only(left: 8),
             boxHeight: widget.height,
             boxWidth: 180,
-            icon: Icon(Icons.expand_more_rounded, color: Colors.grey, size: 20),
+            icon: Icon(Icons.expand_more_rounded, color: Colors.grey, size: 16),
             value: index,
             onChanged: (int? value) {
               setState(() => index = value);
               widget.onChanged(value);
             }));
-    return Container(
-      child: child,
-    );
+    return Container(child: child);
   }
 }
