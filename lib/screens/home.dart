@@ -44,7 +44,7 @@ class HomeScreenState extends State<HomeScreen> {
         prefs.setString('aux_vam2', _vam.text);
         prefs.setString('aux_cliente', clientId.toString());
 
-        initData(res);
+        initData(res, prefs);
       }
     });
   }
@@ -59,7 +59,7 @@ class HomeScreenState extends State<HomeScreen> {
     return await MainApi.getData();
   }
 
-  void initData(res) {
+  void initData(res, SharedPreferences prefs) {
     List<dynamic> distribudores = jsonDecode(res['Distribuidores']);
     List<dynamic> clientes = jsonDecode(res['Clientes']);
 
@@ -76,6 +76,7 @@ class HomeScreenState extends State<HomeScreen> {
     setState(() {
       this._clients = clients;
       this._distributors = distributors;
+      prefs.setString('distribudor', _distributors[0]);
       pUnitario = (jsonDecode(res['FullPrice'])[0]['FullPrice']).toDouble();
       _pUnitario.text = addComa(pUnitario);
       loading = false;
