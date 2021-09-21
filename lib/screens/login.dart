@@ -10,7 +10,6 @@ import 'package:calculator/widgets/snackbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -135,15 +134,15 @@ class LoginScreenState extends State<LoginScreen> {
     if (res.toString() == 'Wrong credential')
       return showSnackbar('Correo y/o contraseña incorrectos.', context);
     else {
-      SharedPreferences.getInstance().then((pref) {
-        dynamic resJson = jsonDecode(res);
-        pref.setString('token', resJson['Token'].toString());
-        pref.setString('data', resJson['Perfil']);
-        pref.setString(
-            'distribudor', jsonDecode(resJson['Perfil'])[0]['Nombre']);
-        Navigator.of(context).pushReplacement(new MaterialPageRoute(
-            builder: (BuildContext context) => HomeScreen()));
-      });
+      dynamic resJson = jsonDecode(res);
+      Navigator.of(context).pushReplacement(
+        new MaterialPageRoute(
+          builder: (BuildContext context) => HomeScreen(
+            token: resJson['Token'].toString(),
+            data: jsonDecode(resJson['Perfil']),
+          ),
+        ),
+      );
     }
   }
 

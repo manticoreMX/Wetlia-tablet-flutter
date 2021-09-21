@@ -3,16 +3,13 @@ import 'dart:io';
 
 import 'package:calculator/public/constants.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 post(url, body) async {
   var headers;
-  SharedPreferences sp = await SharedPreferences.getInstance();
-  var token = sp.getString('token');
-  if (token == null) token = '';
+
   headers = <String, String>{
     'Content-Type': 'application/json; charset=UTF-8',
-    HttpHeaders.authorizationHeader: token.toString()
+    HttpHeaders.authorizationHeader: ''
   };
   body = jsonEncode(body);
   try {
@@ -27,12 +24,10 @@ post(url, body) async {
 
 put(url, body) async {
   var headers;
-  SharedPreferences sp = await SharedPreferences.getInstance();
-  var token = sp.getString('token');
-  if (token == null) token = '';
+
   headers = <String, String>{
     'Content-Type': 'application/json; charset=UTF-8',
-    HttpHeaders.authorizationHeader: token.toString()
+    HttpHeaders.authorizationHeader: ''
   };
   body = jsonEncode(body);
   try {
@@ -47,12 +42,10 @@ put(url, body) async {
 
 get(url) async {
   var headers;
-  SharedPreferences sp = await SharedPreferences.getInstance();
-  var token = sp.getString('token');
-  if (token == null) token = '';
+
   headers = <String, String>{
     'Content-Type': 'application/json; charset=UTF-8',
-    HttpHeaders.authorizationHeader: token.toString()
+    HttpHeaders.authorizationHeader: ''
   };
   try {
     var uri = Uri.parse(SERVER + url);
@@ -66,13 +59,10 @@ get(url) async {
 
 delete(url) async {
   var headers;
-  SharedPreferences sp = await SharedPreferences.getInstance();
-  var token = sp.getString('token');
 
-  if (token == null) token = '';
   headers = <String, String>{
     'Content-Type': 'application/json; charset=UTF-8',
-    HttpHeaders.authorizationHeader: token.toString()
+    HttpHeaders.authorizationHeader: ''
   };
   try {
     var uri = Uri.parse(SERVER + url);
@@ -86,13 +76,10 @@ delete(url) async {
 
 maltipartRequest(String url, String filename) async {
   var headers;
-  SharedPreferences sp = await SharedPreferences.getInstance();
-  var token = sp.getString('token');
 
-  if (token == null) token = '';
   headers = <String, String>{
     'Content-Type': 'application/json; charset=UTF-8',
-    HttpHeaders.authorizationHeader: token.toString()
+    HttpHeaders.authorizationHeader: ''
   };
   var req = http.MultipartRequest('POST', Uri.parse(SERVER + url));
   req.headers.addAll(headers);

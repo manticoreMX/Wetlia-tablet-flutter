@@ -1,5 +1,4 @@
 import 'package:calculator/apis/http.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthApi {
   static login(String email, String password) async {
@@ -12,10 +11,7 @@ class AuthApi {
     return res;
   }
 
-  static logout(String email) async {
-    SharedPreferences sp = await SharedPreferences.getInstance();
-    var token = sp.getString('token');
-    if (token == null) token = '';
+  static logout(String email, String token) async {
     var res = await post('/logOut', {'Token': token, 'Email': email});
     return res;
   }

@@ -7,9 +7,15 @@ import 'package:calculator/widgets/snackbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_overlay/loading_overlay.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SummaryScreen extends StatefulWidget {
+  final dynamic propuesta;
+  final String cliente;
+  final String distribudor;
+  SummaryScreen(
+      {required this.propuesta,
+      required this.cliente,
+      required this.distribudor});
   @override
   SummaryScreenState createState() => SummaryScreenState();
 }
@@ -33,15 +39,13 @@ class SummaryScreenState extends State<SummaryScreen> {
   String distribuidor = '';
   String rentabilidad = '';
   void initData() {
-    SharedPreferences.getInstance().then((prefs) {
-      dynamic propuesta = jsonDecode(prefs.getString('Propuesta')!);
-      setState(() {
-        cliente = prefs.getString('cliente') ?? '';
-        precio = propuesta['NuevoPrecioPromedio'];
-        descuento = propuesta['NuevoDescuentoSobreFullPrice'];
-        distribuidor = prefs.getString('distribudor') ?? '';
-        rentabilidad = propuesta['DiferencialEnValores'];
-      });
+    dynamic propuesta = jsonDecode(widget.propuesta);
+    setState(() {
+      cliente = widget.cliente;
+      precio = propuesta['NuevoPrecioPromedio'];
+      descuento = propuesta['NuevoDescuentoSobreFullPrice'];
+      distribuidor = widget.distribudor;
+      rentabilidad = propuesta['DiferencialEnValores'];
     });
   }
 
@@ -176,8 +180,8 @@ class SummaryScreenState extends State<SummaryScreen> {
 
   onSend() async {
     setState(() => loading = true);
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    dynamic propuesta = jsonDecode(prefs.getString('Propuesta')!);
+    dynamic propuesta = widget.propuesta;
+
     dynamic data = {
       'Email': propuesta['Email'],
       'Cliente': {'Cliente': cliente},
@@ -213,8 +217,7 @@ class SummaryScreenState extends State<SummaryScreen> {
 
   onSave() async {
     setState(() => loading = true);
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    dynamic propuesta = jsonDecode(prefs.getString('Propuesta')!);
+    dynamic propuesta = widget.propuesta;
     dynamic data = {
       'Distribuidor': {'Distribuidor': distribuidor},
       'Informacion': propuesta
